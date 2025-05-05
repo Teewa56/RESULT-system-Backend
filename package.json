@@ -29,5 +29,8 @@
     "express": "^5.1.0",
     "jest": "^29.7.0",
     "mongoose": "^8.14.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
   }
 }
