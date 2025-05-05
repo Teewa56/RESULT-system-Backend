@@ -1,0 +1,1302 @@
+{ "Departments" : [
+    {
+        "Computer Science": {
+            "100 Level": {
+                "First Semester": [
+                    {
+                        "Course Code": "CSC 101",
+                        "Course Title": "Introduction to Computer",
+                        "Course Units": 3   
+                    }
+                ],
+                "Second Semester": [
+                    {
+                        "Course Code": "CSC 102",
+                        "Course Title": "Introduction to Computer 2",
+                        "Course Units": 2 
+                    }
+                ]
+            },
+            "200 Level": {
+                "First Semester": [
+                    {
+                        "Course Code": "CSC 201",
+                        "Course Title": "Introduction to Computer Programming",
+                        "Course Units": 3 
+                    }
+                ],
+                "Second Semester": [
+                    {
+                        "Course Code": "CSC 202",
+                        "Course Title": "Assembly programming",
+                        "Course Units": 3 
+                    }
+                ]
+            },
+            "300 Level": {
+                "First Semester": [
+                    {
+                        "Course Code": "CSC 301",
+                        "Course Title": "C Programming",
+                        "Course Units": 3 
+                    }
+                ],
+                "Second Semester": [
+                    {
+                        "Course Code": "CSC 302",
+                        "Course Title": "Data Analysis",
+                        "Course Units": 3 
+                    }
+                ]
+            },
+            "400 Level": {
+                "First Semester": [
+                    {
+                        "Course Code": "CSC 101",
+                        "Course Title": "Computer Architecture",
+                        "Course Units": 3 
+                    }
+                ],
+                "Second Semester": [
+                    {
+                        "Course Code": "CSC 402",
+                        "Course Title": "System Design",
+                        "Course Units": 3 
+                    }
+                ]
+            },
+            "500 Level": {
+                "First Semester": [
+                    {
+                        "Course Code": "CSC 501",
+                        "Course Title": "Soft Computing",
+                        "Course Units": 3 
+                    }
+                ],
+                "Second Semester": [
+                    {
+                        "Course Code": "CSC 101",
+                        "Course Title": "Database design",
+                        "Course Units": 3 
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "Mathematics": {
+            "100 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "200 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "300 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "400 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "500 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "Cyber Security": {
+            "100 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "200 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "300 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "400 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "500 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            }
+        }
+    },
+    { 
+        "Statitics": {
+            "100 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "200 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "300 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "400 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "500 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "Chemistry": {
+            "100 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "200 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "300 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "400 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "500 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "Physics": {
+            "100 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "200 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "300 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "400 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "500 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "Biology": {
+            "100 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "200 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "300 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "400 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "500 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "Information Systems": {
+            "100 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "200 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "300 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "400 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "500 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "Biotechnology": {
+            "100 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "200 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "300 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "400 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "500 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "Biochemistry": {
+            "100 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "200 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "300 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "400 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "500 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "Applied Geophyscics": {
+            "100 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "200 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "300 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "400 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "500 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "Surveing and Geoformatics": {
+            "100 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "200 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "300 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "400 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "500 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "Architecture": {
+            "100 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "200 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "300 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "400 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "500 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "Industrial Design": {
+            "100 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "200 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "300 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "400 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "500 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "Remote sensing and GIS": {
+            "100 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "200 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "300 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "400 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "500 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "Crop Science and Pest Management": {
+            "100 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "200 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "300 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "400 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "500 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "Physiology": {
+            "100 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "200 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "300 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "400 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "500 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "Project Management": {
+            "100 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "200 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "300 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "400 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "500 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "Mechanical Engineering": {
+            "100 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "200 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "300 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "400 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "500 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "Civil Engineering": {
+            "100 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "200 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "300 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "400 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            },
+            "500 Level": {
+                "First Semester": [
+                    {
+
+                    }
+                ],
+                "Second Semester": [
+                    {
+
+                    }
+                ]
+            }
+        }
+    }
+]}
