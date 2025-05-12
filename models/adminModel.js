@@ -1,20 +1,16 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const adminSchema = new mongoose.Schema({
-    fullName: {type: String}, 
-    adminId: {type: String, unique: true, required: true},
-    adminPassword: {type: String},
-    DOB: {type: Date}, 
-    phoneNumber: {type: String}, 
-    email: {type: String},
-    stateOfOrigin: {type: String},
-    dateEmployed: {type: Date},
-    currentSemester: {type: String},
-    studentsResults: [{type: mongoose.Schema.Types.ObjectId}],
-    classResults: [{type: mongoose.Schema.Types.ObjectId}],
-    students: [{type: mongoose.Schema.Types.ObjectId}],
-    lecturers: [{type: mongoose.Schema.Types.ObjectId}],
-    admins: [{type: mongoose.Schema.Types.ObjectId}]
-})
+const adminSchema = new Schema({
+  fullName: { type: String, required: true },
+  email: { type: String, unique: true, sparse: true },
+  adminId: { type: String, required: true, unique: true },
+  dateOfBirth: { type: Date },
+  stateOfOrigin: { type: String },
+  phone: { type: String },
+  gender: { type: String },
+  profilePic: { type: String },
+  password: { type: String, required: true },
+}, { timestamps: true });
 
 module.exports = mongoose.model('Admin', adminSchema);

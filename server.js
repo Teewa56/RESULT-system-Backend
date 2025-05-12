@@ -4,6 +4,13 @@ const express = require('express');
 const http = require('http');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+
+const errorMiddleware = require('./middleware/errorMiddleware');
+const studentRoutes = require('./routes/studentRoutes');
+const lecturerRoutes = require('./routes/lecturerRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const limiter = require('./middleware/rateLimiter');
+
 const app = express();
 const deployedFrontendURL = process.env.DEPLOYED_FRONTEND_URL;
 app.use(cors({
@@ -13,6 +20,12 @@ app.use(cors({
 }));
 app.use(cookieParser());
 app.use(express.json());
+app.use('/api/admin', adminRoutes);
+app.use('/api/student', studentRoutes);
+app.use('/api/lecturer', lecturerRoutes);
+app.use(errorMiddleware);
+app.use(limiter);   
+
 const server = http.createServer(app);
 const port = process.env.PORT;
 connectDb().then(() => {
