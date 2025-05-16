@@ -2,7 +2,7 @@ const {
     signIn,
     studentProfile,
     logout,
-    registeredCourses,
+    getRegisteredStudents,
     carryOverCourses,
     result,
     allResults,
@@ -15,7 +15,7 @@ const authMiddleware = require('../middleware/authMiddleWare');
 router.post('/signIn', signIn);
 router.post('/logout', authMiddleware, logout);
 router.get('/profile/:studentId', authMiddleware, studentProfile);
-router.get('/registeredCourses/studentId', authMiddleware, registeredCourses);
+router.get('/registeredCourses/studentId', authMiddleware, getRegisteredStudents);
 router.get('/carryOverCourses/:id', authMiddleware, carryOverCourses);
 router.post('/result/:id', authMiddleware, result);
 router.get('/results/:id', authMiddleware, allResults);
