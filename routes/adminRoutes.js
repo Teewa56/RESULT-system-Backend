@@ -37,9 +37,9 @@ router.put('/editAdmin/:id', authMiddleware, editAdminProfile);
 router.put('/editStudent/:id', authMiddleware, editStudentInfo);
 
 // Creation routes
-router.post('/newAdmin', authMiddleware ,newAdmin);
-router.post('/newLecturer', authMiddleware, newLecturer);
-router.post('/newStudent', authMiddleware, newStudent);
+router.post('/newAdmin', /*authMiddleware ,*/newAdmin);
+router.post('/newLecturer', /*authMiddleware,*/ newLecturer);
+router.post('/newStudent', /*authMiddleware,*/ newStudent);
 
 // Retrieval routes
 router.get('/allAdmins', authMiddleware, allAdmins);

@@ -3,8 +3,8 @@ const Schema = mongoose.Schema;
 
 const studentSchema = new Schema({
   fullName:             { type: String, required: true },
-  email:                { type: String, unique: true, sparse: true },
-  matricNo:             { type: String, unique: true, required: true, },
+  email:                { type: String },
+  matricNo:             { type: String, unique: true, required: true },
   currentLevel:         { type: String },
   currentSemester:      { type: String },
   stateOfOrigin:        { type: String },

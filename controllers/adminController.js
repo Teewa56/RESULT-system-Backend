@@ -131,9 +131,18 @@ const adminController = {
             const matricNumberRegex = /^[A-Za-z]{3}\/\d{2}\/\d{4}$/;
             if (!matricNumberRegex.test(matricNo)) return res.status(400).json({ message: 'Invalid matric number format' });
 
-            const student = await Student.findOne({ matricNo });
+            const student = await Student.findOne({ matricNo: matricNo });
             if (student) return res.status(400).json({ message: 'Student already exists' });
-
+            let registeredCourses = [];
+            const semesterKey = currentSemester;
+        
+            if (coursesData[department] && 
+            coursesData[department][currentLevel] && 
+            coursesData[department][currentLevel][semesterKey]) {
+                registeredCourses = coursesData[department][currentLevel][semesterKey].map(
+                    course => course["Course-Code"]
+                );
+            }
             const newStudent = new Student({
                 fullName: fullName ,
                 email: email ,
@@ -148,6 +157,7 @@ const adminController = {
                 phone: phone,
                 yearOfAdmission: yearOfAdmission,
                 yearOfGraduation: yearOfGraduation,
+                registeredCourses: registeredCourses
             });
             await newStudent.save();
             return res.status(201).json({ message: 'Student created successfully', newStudent });
@@ -163,30 +173,33 @@ const adminController = {
             const lecturerIdRegex = /^[A-Za-z]{4}\/\d{4}$/;
             if (!lecturerIdRegex.test(registrationId)) return res.status(400).json({ message: 'Invalid registration ID format' });
 
-            const lecturerExists = await Lecturer.findOne({ registrationId: registrationId });
+            const lecturerExists = await Lecturer.findOne({ registrationId });
             if (lecturerExists) return res.status(400).json({ message: 'Lecturer already exists' });
 
+            const assignedCourses = await Lecturer.find({ coursesTaking: { $in: coursesTaking } }, 'coursesTaking');
+            const assignedCourseCodes = assignedCourses.flatMap(l => l.coursesTaking);
+
+            const unassignedCourses = coursesTaking.filter(course => !assignedCourseCodes.includes(course));
+
+            if (unassignedCourses.length === 0) {
+                return res.status(400).json({ message: 'All selected courses are already assigned to other lecturers' });
+            }
+
             const newLecturer = new Lecturer({
-                fullName: fullName,
-                email: email,
-                registrationId: registrationId,
-                stateOfOrigin: stateOfOrigin,
-                department: department,
-                dateOfBirth: dateOfBirth,
-                profilePic: profilePic,
-                phone: phone,
-                gender: gender,
-                dateEmployed: dateEmployed,
-                coursesTaking: coursesTaking,
+                fullName,
+                email,
+                registrationId,
+                stateOfOrigin,
+                department,
+                dateOfBirth,
+                profilePic,
+                phone,
+                gender,
+                dateEmployed,
+                coursesTaking: unassignedCourses,
             });
             await newLecturer.save();
-            //check if there is an existing lecturer for the course 
-            //then send a res that there is an existing lecturer for the course but still do the ones it is supposed to do so it wont
-            //affect the courses
-            //also it is the course code that is comin gfrom the frontend so you will have 
-            //to get the course id first then submit it or maybe i shpould have separate models for it
-            //for it to be easier
-            return res.status(201).json({ message: 'Lecturer created successfully', newLecturer });
+            return res.status(201).json({ message: 'Lecturer created successfully', newLecturer, assignedCourses: assignedCourseCodes });
         } catch (error) {
             return res.status(500).json({ message: `Server error: ${error.message}` });
         }
