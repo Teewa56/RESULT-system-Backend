@@ -1,7 +1,6 @@
 const Admin = require('../models/adminModel');
 const Lecturer = require('../models/lecturerModel');
 const Student = require('../models/studentModel');
-const Course = require('../models/courseModel');
 const Result = require('../models/resultModels');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
@@ -19,7 +18,7 @@ const adminController = {
             const admin = await Admin.findOne({ adminId: userId });
             if (!admin) return res.status(404).json({ message: 'Admin not found' });
             if (admin.fullName !== fullName) return res.status(401).json({ message: 'Wrong name' });
-            if (!(await bcrypt.compare(adminPassword, admin.password))) return res.status(401).json({ message: 'Wrong password' });
+            if (!(await bcrypt.compare(adminPassword, admin.hashedPassword))) return res.status(401).json({ message: 'Wrong password' });
             const access_token = adminController.creatAccessToken({ id: admin._id });
             const refresh_token = adminController.createRefreshToken({ id: admin._id });
             res.cookie('refresh_token', refresh_token, {
@@ -29,7 +28,6 @@ const adminController = {
             });
             return res.status(200).json({ message: 'Sign in successful', access_token, admin });
         } catch (error) {
-            console.error(error.message);
             return res.status(500).json({ message: `Server error: ${error.message}` });
         }
     },
@@ -50,7 +48,6 @@ const adminController = {
             if (!admin) return res.status(404).json({ message: 'Admin not found' });
             return res.status(200).json({ message: 'Admin profile retrieved successfully', admin });
         } catch (error) {
-            console.error(error.message);
             return res.status(500).json({ message: `Server error: ${error.message}` });
         }
     },
@@ -64,12 +61,11 @@ const adminController = {
             if (!admin) return res.status(404).json({ message: 'Admin profile not found' });
 
             if (email) {
-                const existingAdmin = await Admin.findOne({ email });
+                const existingAdmin = await Admin.findOne({ email: email });
                 if (existingAdmin && existingAdmin.id !== adminId) {
                     return res.status(400).json({ message: 'Email is already in use' });
                 }
             }
-
             if (fullName) admin.fullName = fullName;
             if (email) admin.email = email;
             if (dateOfBirth) admin.dateOfBirth = dateOfBirth;
@@ -78,56 +74,56 @@ const adminController = {
             if (gender) admin.gender = gender;
             if (profilePic) admin.profilePic = profilePic;
             if (password) {
-                admin.password = await bcrypt.hash(password, 13);
+                admin.normalPassword = password;
+                admin.hashedPassword = await bcrypt.hash(password, 13);
             }
-
             await admin.save();
             return res.status(200).json({ message: 'Admin profile updated successfully', admin });
         } catch (error) {
-            console.error("Error updating admin profile:", error);
             return res.status(500).json({ message: `Server error: ${error.message}` });
         }
     },
 
     newAdmin: async (req, res) => {
-    const { adminInfo } = req.body;
-    const { fullName, email, adminId, dateOfBirth, stateOfOrigin, phone, gender, profilePic } = adminInfo;
+        const { adminInfo } = req.body;
+        const { fullName, email, adminId, dateOfBirth, dateOfEmployment, stateOfOrigin, phone, gender, profilePic } = adminInfo;
 
-    try {
-        const adminIdRegex = /^[A-Z]{4}\/\d{4}$/;
-        if (!adminIdRegex.test(adminId)) return res.status(400).json({ message: 'Invalid admin ID format' });
-        const admin = await Admin.findOne({ adminId });
-        if (admin) return res.status(400).json({ message: 'Admin already exists' });
-        const generatePassword = (length = 8) => {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-            return Array.from(crypto.randomFillSync(new Uint8Array(length)))
-                .map((x) => chars[x % chars.length])
-                .join('');
-        };
-        const plainPassword = generatePassword(8); 
-        const hashedPassword = await bcrypt.hash(plainPassword, 13); 
-        const newAdmin = new Admin({
-            fullName: fullName,
-            email: email,
-            adminId: adminId,
-            dateOfBirth: dateOfBirth,
-            stateOfOrigin: stateOfOrigin,
-            phone: phone,
-            gender: gender,
-            profilePic: profilePic,
-            password: hashedPassword,
-        });
-        await newAdmin.save();
-        return res.status(201).json({
-            message: 'Admin created successfully',
-            newAdmin,
-            plainPassword, 
-        });
-    } catch (error) {
-        console.error(error.message);
-        return res.status(500).json({ message: `Server error: ${error.message}` });
-    }
-},
+        try {
+            const adminIdRegex = /^[A-Z]{4}\/\d{4}$/;
+            if (!adminIdRegex.test(adminId)) return res.status(400).json({ message: 'Invalid admin ID format' });
+            const admin = await Admin.findOne({ adminId });
+            if (admin) return res.status(400).json({ message: 'Admin already exists' });
+            const generatePassword = (length = 8) => {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+                return Array.from(crypto.randomFillSync(new Uint8Array(length)))
+                    .map((x) => chars[x % chars.length])
+                    .join('');
+            };
+            const plainPassword = generatePassword(8); 
+            const hashedPassword = await bcrypt.hash(plainPassword, 13); 
+            const newAdmin = new Admin({
+                fullName: fullName,
+                email: email,
+                adminId: adminId,
+                dateOfBirth: dateOfBirth,
+                stateOfOrigin: stateOfOrigin,
+                dateOfEmployment: dateOfEmployment,
+                phone: phone,
+                gender: gender,
+                profilePic: profilePic,
+                hashedPassword: hashedPassword,
+                normalPassword: plainPassword,
+            });
+            await newAdmin.save();
+            return res.status(201).json({
+                message: 'Admin created successfully',
+                newAdmin,
+                plainPassword, 
+            });
+        } catch (error) {
+            return res.status(500).json({ message: `Server error: ${error.message}` });
+        }
+    },
     newStudent: async (req, res) => {
         const { studentInfo } = req.body;
         const {fullName, email, matricNo, currentLevel, currentSemester, currentSession, stateOfOrigin, department, dateOfBirth, profilePic, phone, yearOfAdmission, yearOfGraduation } = studentInfo
@@ -156,19 +152,18 @@ const adminController = {
             await newStudent.save();
             return res.status(201).json({ message: 'Student created successfully', newStudent });
         } catch (error) {
-            console.error(error.message);
             return res.status(500).json({ message: `Server error: ${error.message}` });
         }
     },
 
     newLecturer: async (req, res) => {
         const { lecturerInfo } = req.body;
-        const { fullName, email, registrationId, stateOfOrigin, department, dateOfBirth, profilePic, phone, dateEmployed, coursesTaking } = lecturerInfo;
+        const { fullName, email, registrationId, stateOfOrigin, department, dateOfBirth, profilePic, phone, dateEmployed, gender, coursesTaking } = lecturerInfo;
         try {
             const lecturerIdRegex = /^[A-Za-z]{4}\/\d{4}$/;
             if (!lecturerIdRegex.test(registrationId)) return res.status(400).json({ message: 'Invalid registration ID format' });
 
-            const lecturerExists = await Lecturer.findOne({ registrationId });
+            const lecturerExists = await Lecturer.findOne({ registrationId: registrationId });
             if (lecturerExists) return res.status(400).json({ message: 'Lecturer already exists' });
 
             const newLecturer = new Lecturer({
@@ -180,19 +175,19 @@ const adminController = {
                 dateOfBirth: dateOfBirth,
                 profilePic: profilePic,
                 phone: phone,
+                gender: gender,
                 dateEmployed: dateEmployed,
                 coursesTaking: coursesTaking,
             });
             await newLecturer.save();
-
-            await Course.updateMany(
-                { courseCode: { $in: coursesTaking } },
-                { $set: { lecturer: newLecturer._id } }
-            );
-
+            //check if there is an existing lecturer for the course 
+            //then send a res that there is an existing lecturer for the course but still do the ones it is supposed to do so it wont
+            //affect the courses
+            //also it is the course code that is comin gfrom the frontend so you will have 
+            //to get the course id first then submit it or maybe i shpould have separate models for it
+            //for it to be easier
             return res.status(201).json({ message: 'Lecturer created successfully', newLecturer });
         } catch (error) {
-            console.error(error.message);
             return res.status(500).json({ message: `Server error: ${error.message}` });
         }
     },
@@ -202,7 +197,6 @@ const adminController = {
             const students = await Student.find();
             return res.status(200).json({ message: 'All students retrieved successfully', students });
         } catch (error) {
-            console.error(error.message);
             return res.status(500).json({ message: `Server error: ${error.message}` });
         }
     },
@@ -212,7 +206,6 @@ const adminController = {
             const lecturers = await Lecturer.find();
             return res.status(200).json({ message: 'All lecturers retrieved successfully', lecturers });
         } catch (error) {
-            console.error(error.message);
             return res.status(500).json({ message: `Server error: ${error.message}` });
         }
     },
@@ -222,7 +215,6 @@ const adminController = {
             const admins = await Admin.find();
             return res.status(200).json({ message: 'All admins retrieved successfully', admins });
         } catch (error) {
-            console.error(error.message);
             return res.status(500).json({ message: `Server error: ${error.message}` });
         }
     },
@@ -239,7 +231,6 @@ const adminController = {
             if (!results.length) return res.status(404).json({ message: 'No students found matching the search criteria' });
             return res.status(200).json({ message: 'Search results', results });
         } catch (error) {
-            console.error(error.message);
             return res.status(500).json({ message: `Server error: ${error.message}` });
         }
     },
@@ -256,7 +247,6 @@ const adminController = {
             if (!results.length) return res.status(404).json({ message: 'No lecturers found matching the search criteria' });
             return res.status(200).json({ message: 'Search results', results });
         } catch (error) {
-            console.error(error.message);
             return res.status(500).json({ message: `Server error: ${error.message}` });
         }
     },
@@ -265,20 +255,37 @@ const adminController = {
         const { data } = req.body;
         const {level, department, semester} = data;
         try {
-            const students = await Student.find({ level, department, semester }).populate('courses.courseCode courses.lecturer');
-            if (!students.length) return res.status(404).json({ message: 'No results found for the specified criteria' });
-            const results = students.map(student => ({
-                studentId: student._id,
-                fullName: student.fullName,
-                matricNo: student.matricNo,
-                courses: student.courses.map(course => ({
-                    courseCode: course.courseCode,
-                    courseTitle: course.courseTitle,
-                    score: course.score,
-                    grade: course.grade,
-                })),
+            const students = await Student.find({ 
+                currentLevel: level, 
+                department: department, 
+                currentSemester: semester 
+            });
+            
+            if (!students.length) {
+                return res.status(404).json({ 
+                    message: 'No students found for the specified criteria' 
+                });
+            }
+
+            const results = await Promise.all(students.map(async (student) => {
+                const studentResults = await Result.find({
+                    student: student._id, 
+                    level: level, 
+                    semester: semester
+                });
+                
+                return {
+                    studentId: student._id,
+                    fullName: student.fullName,
+                    matricNo: student.matricNo,
+                    results: studentResults
+                };
             }));
-            return res.status(200).json({ message: 'Results', results });
+
+            return res.status(200).json({ 
+                message: 'Results retrieved successfully', 
+                results 
+            });
         } catch (error) {
             console.error(error.message);
             return res.status(500).json({ message: `Server error: ${error.message}` });
@@ -287,7 +294,7 @@ const adminController = {
 
     closeResultSubmission: async (req, res) => {
         try {
-            await Course.updateMany({}, { $set: { submissionClosed: true } });
+            await Result.updateMany({}, { $set: { isClosed: true } });
             return res.status(200).json({ message: 'All courses result submission closed' });
         } catch (error) {
             console.error(error.message);
@@ -299,8 +306,7 @@ const adminController = {
         try {
             const results = await Result.find();
             if (!results.length) return res.status(404).json({ message: 'No results available to release' });
-
-            await Result.updateMany({}, { $set: { released: true } });
+            await Result.updateMany({}, { $set: { isReleased: true } });
             return res.status(200).json({ message: 'Results released successfully' });
         } catch (error) {
             console.error(error.message);

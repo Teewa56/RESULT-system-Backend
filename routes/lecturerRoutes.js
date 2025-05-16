@@ -7,18 +7,20 @@ const {
     getCourseTaking,
     editCourseResults,
     uploadCourseResults,
-    generateToken
+    generateToken,
+    getRegisteredStudents
 } = require('../controllers/lecturerController');
 const router = require('express').Router();
 const authMiddleware = require('../middleware/authMiddleWare');
 
 router.post('/signIn', signIn);
 router.post('/logout', authMiddleware,logout);
-router.get('/profile/:id', authMiddleware, lecturerProfile);
-router.get('/courses-taking/:id', authMiddleware,coursesTaking);
-router.get('/course-taking/:courseId', authMiddleware,getCourseTaking);
-router.get('/results/:lecturerId/:courseId', authMiddleware,getCourseResults);
-router.put('/result/:lecturerId/:studentId/:courseCode', authMiddleware,editCourseResults);
+router.get('/profile/:lecturerId', authMiddleware, lecturerProfile);
+router.get('/registered-students/:courseCode', authMiddleware, getRegisteredStudents)
+router.get('/courses-taking/:lecturerId', authMiddleware,coursesTaking);
+router.get('/course-taking/:courseCode', authMiddleware,getCourseTaking);
+router.get('/results/:lecturerId', authMiddleware,getCourseResults);
+router.put('/result/:lecturerId', authMiddleware,editCourseResults);
 router.post('/result/:lecturerId', authMiddleware,uploadCourseResults);
 router.post('/refresh_token', authMiddleware,generateToken)
 

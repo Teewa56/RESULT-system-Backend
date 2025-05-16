@@ -28,7 +28,7 @@ const authMiddleware = require('../middleware/authMiddleWare');
 
 // Authentication and profile routes
 router.post('/signIn', signIn);
-router.get('/profile/:id', authMiddleware, adminProfile);
+router.get('/profile/:adminId', authMiddleware, adminProfile);
 router.post('/logout', authMiddleware,logout);
 
 // Edit routes
