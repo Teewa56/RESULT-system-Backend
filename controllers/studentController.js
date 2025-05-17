@@ -28,7 +28,7 @@ const studentController = {
 
     logout: async (req, res) => {
         try {
-            res.clearCookie('refreshtoken', { path: '/api/refresh_token' });
+            res.clearCookie('refreshtoken', { path: '/api/student/refresh_token' });
             return res.json({ msg: "Logged out" });
         } catch (error) {
             return res.status(500).json({ msg: error.message });
@@ -36,9 +36,9 @@ const studentController = {
     },
 
     studentProfile: async (req, res) => {
-        const { id } = req.params;
+        const { studentId } = req.params;
         try {
-            const student = await Student.findById(id);
+            const student = await Student.findById(studentId);
             if (!student) return res.status(404).json({ message: "Student not found" });
             return res.status(200).json({ message: "Student profile retrieved successfully", student });
         } catch (error) {
@@ -46,25 +46,10 @@ const studentController = {
         }
     },
 
-    getRegisteredStudents: async (req, res) => {
-        const {courseCode} = req.params;
-        try {
-            const students = await Student.find({
-                registeredCourses: { $in: [courseCode] }
-            });
-            return res.status(200).json({
-                message: 'Students retrieved successfully', 
-                registeredStudents: students 
-            });
-        } catch (error) {
-            return res.status(500).json({ message: `Server error: ${error.message}` });
-        }
-    },
-
     carryOverCourses: async (req, res) => {
-        const { id } = req.params;
+        const { studentId } = req.params;
         try {
-            const student = await Student.findById(id).populate('carryOverCourses');
+            const student = await Student.findById(studentId).populate('carryOverCourses');
             if (!student) return res.status(404).json({ message: "Student not found" });
             return res.status(200).json({ message: "Carry over courses retrieved successfully", courses: student.carryOverCourses });
         } catch (error) {
@@ -73,11 +58,11 @@ const studentController = {
     },
     
     result: async (req, res) => {
-        const { id } = req.params;
+        const { studentId } = req.params;
         const { data } = req.body;
         const {level, semester} = data;
         try {
-            const student = await Student.findById(id);
+            const student = await Student.findById(studentId);
             if (!student) return res.status(404).json({ message: "Student not found" });
             const results = await Result.find({ student: id, level: level, semester: semester, isReleased: true});
             if (!results.length) return res.status(404).json({ message: "No results found for this semester" });
@@ -99,12 +84,35 @@ const studentController = {
         }
     },
 
-    allResults: async (req, res) => {
-        const { id } = req.params;
+    getRegisteredCourses: async (req, res) => {
+        const { studentId } = req.params;
         try {
-            const student = await Student.findById(id);
-            if (!student) return res.status(404).json({ message: "Student not found" });
-            const results = await Result.find({ student: id });
+            const student = await Student.findById(studentId);
+            if (!student) {
+                return res.status(404).json({ message: "Student not found" });
+            }
+            const { registeredCourses = [], department } = student;
+            const departmentCourses = coursesData[department];
+            if (!departmentCourses) {
+                return res.status(404).json({ message: "Department not found in courses data" });
+            }
+            const allCourses = Object.values(departmentCourses).flatMap(level =>
+                Object.values(level).flat()
+            );
+            const matchedCourses = registeredCourses.map(code => {
+                return allCourses.find(course => course["Course-Code"] === code);
+            }).filter(course => course); 
+            return res.status(200).json({ courses: matchedCourses });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ message: "Internal server error" });
+        }
+    },
+
+    allResults: async (req, res) => {
+        const { studentId } = req.params;
+        try {
+            const results = await Result.find({ student: studentId });
             if (!results.length) return res.status(404).json({ message: "No results found" });
             return res.status(200).json({ message: "All results retrieved successfully", results });
         } catch (error) {
@@ -113,37 +121,39 @@ const studentController = {
         }
     },
     getGPA: async (req, res) => {
-        const { id } = req.params;
-        const { data } = req.body;
-        const {semester, level} = data;
+        const { studentId } = req.params;
+        const { semester, level } = req.body;
+        
         try {
-            const student = await Student.findById(id);
+            const student = await Student.findById(studentId);
             if (!student) return res.status(404).json({ message: "Student not found" });
             
-            const existingResults = await Result.find({ 
-                student: id, 
-                semester, 
+            const existingResults = await Result.find({
+                student: studentId,
+                semester,
                 level,
-                isGpaCalculated: true 
+                isGpaCalculated: true
             });
             
             if (existingResults.length > 0) {
-                return res.status(200).json({ 
-                    message: "GPA already calculated for this semester", 
-                    gpa: student.cgpa 
+                return res.status(200).json({
+                    message: "GPA already calculated for this semester",
+                    cgpa: student.cgpa,
+                    gpa: student.semesterGPA
                 });
             }
-
-            const results = await Result.find({ student: id, semester, level });
+            
+            const results = await Result.find({ student: studentId, semester, level, isReleased: true });
             if (!results.length) return res.status(404).json({ message: "No results found for this semester" });
             
             let totalWeightedPoints = 0;
             let totalUnits = 0;
             
-            results.forEach(result => {
+            for (const result of results) {
                 const { testScore, examScore, courseCode } = result;
                 const totalScore = testScore + examScore;
                 let gradePoint;
+                
                 if (totalScore >= 70) gradePoint = 5;
                 else if (totalScore >= 60) gradePoint = 4;
                 else if (totalScore >= 50) gradePoint = 3;
@@ -151,29 +161,47 @@ const studentController = {
                 else if (totalScore >= 40) gradePoint = 1;
                 else gradePoint = 0;
                 
-                const courseUnits = coursesData[student.department]?.[student.currentLevel]?.[student.currentSemester]?.[courseCode]?.['Course-Units'] || 0;
+                const courseInfo = coursesData[student.department]?.[level]?.[semester]?.find(
+                    course => course['Course-Code'] === courseCode
+                );
+                
+                if (!courseInfo) {
+                    console.warn(`Course info not found for course code: ${courseCode}`);
+                    continue;
+                }
+                
+                const courseUnits = courseInfo['Course-Units'] || 0;
                 totalWeightedPoints += gradePoint * courseUnits;
                 totalUnits += courseUnits;
-            });
+            }
+            
             const gpa = totalUnits > 0 ? (totalWeightedPoints / totalUnits).toFixed(2) : 0;
+            const semesterGPA = parseFloat(gpa); 
+            
             await Result.updateMany(
-                { student: id, semester, level },
+                { student: studentId, semester, level },
                 { $set: { isGpaCalculated: true } }
             );
+            
             if (!existingResults.length) {
-                student.cgpa = ((student.cgpa * student.levelsCompleted) + parseFloat(gpa)) / (student.levelsCompleted + 1);
+                student.semesterGPA = semesterGPA;
+                student.cgpa = ((student.cgpa * student.levelsCompleted) + semesterGPA) / (student.levelsCompleted + 1);
                 student.levelsCompleted += 1;
                 await student.save();
+            } else {
+                await Student.findByIdAndUpdate(studentId, {
+                    $set: { semesterGPA }
+                });
             }
-
-            return res.status(200).json({ 
-                message: "GPA calculated successfully", 
-                gpa, 
-                cgpa: student.cgpa 
+            
+            return res.status(200).json({
+                message: "GPA calculated successfully",
+                gpa: semesterGPA,
+                cgpa: student.cgpa
             });
         } catch (error) {
             console.error('Error in getGPA:', error.message);
-            return res.status(500).json({ message: "Internal server error" });
+            return res.status(500).json({ message: "Internal server error", error: error.message });
         }
     },
 

@@ -20,45 +20,46 @@ const {
     studentProfile,
     lecturerProfile,
     registerCoursesForSemester,
+    getCurrentSemester,
     updateStudentSemesterLevel,
     generateToken
 } = require('../controllers/adminController');
 const router = require('express').Router();
-const authMiddleware = require('../middleware/authMiddleWare');
 
 // Authentication and profile routes
 router.post('/signIn', signIn);
-router.get('/profile/:adminId', authMiddleware, adminProfile);
-router.post('/logout', authMiddleware,logout);
+router.get('/profile/:adminId',  adminProfile);
+router.post('/logout', logout);
 
 // Edit routes
-router.put('/editLecturer/:id', authMiddleware, editLecturerInfo);
-router.put('/editAdmin/:id', authMiddleware, editAdminProfile);
-router.put('/editStudent/:id', authMiddleware, editStudentInfo);
+router.put('/editLecturer/:id',  editLecturerInfo);
+router.put('/editAdmin/:id',  editAdminProfile);
+router.put('/editStudent/:id',  editStudentInfo);
 
 // Creation routes
-router.post('/newAdmin', /*authMiddleware ,*/newAdmin);
-router.post('/newLecturer', /*authMiddleware,*/ newLecturer);
-router.post('/newStudent', /*authMiddleware,*/ newStudent);
+router.post('/newAdmin',  newAdmin);
+router.post('/newLecturer',  newLecturer);
+router.post('/newStudent',  newStudent);
 
 // Retrieval routes
-router.get('/allAdmins', authMiddleware, allAdmins);
-router.get('/allStudents', authMiddleware, allStudents);
-router.get('/allLecturers', authMiddleware, allLecturers);
-router.get('/searchLecturer/:search', authMiddleware, searchLecturer);
-router.get('/searchStudent/:search', authMiddleware, searchStudent);
-router.get('/studentProfile/:id', authMiddleware, studentProfile);
-router.get('/lecturerProfile/:id', authMiddleware, lecturerProfile);
+router.get('/allAdmins',  allAdmins);
+router.get('/allStudents',  allStudents);
+router.get('/allLecturers',  allLecturers);
+router.get('/searchLecturer/:search',  searchLecturer);
+router.get('/searchStudent/:search',  searchStudent);
+router.get('/studentProfile/:id',  studentProfile);
+router.get('/lecturerProfile/:id',  lecturerProfile);
 
 // Result and course management routes
-router.get('/resultPreview', authMiddleware, resultPreview);
-router.post('/releaseResult', authMiddleware, releaseResult);
-router.post('/closeResultSubmission', authMiddleware, closeResultSubmission);
-router.get('/getCourseInfo/:courseId', authMiddleware, getCourseInfo);
+router.post('/resultPreview', resultPreview);
+router.post('/releaseResult',  releaseResult);
+router.post('/closeResultSubmission',  closeResultSubmission);
+router.get('/getCourseInfo',  getCourseInfo);
+router.get('/currentSemester', getCurrentSemester);
 
 // Semester and course registration routes
-router.post('/registerCourses', authMiddleware, registerCoursesForSemester);
-router.post('/updateStudentSemesterLevel', authMiddleware, updateStudentSemesterLevel);
-router.post('/refresh_token', authMiddleware, generateToken)
+router.post('/registerCourses',  registerCoursesForSemester);
+router.post('/updateStudentSemesterLevel',  updateStudentSemesterLevel);
+router.post('/refresh_token',  generateToken)
 
 module.exports = router;

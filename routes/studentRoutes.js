@@ -2,24 +2,23 @@ const {
     signIn,
     studentProfile,
     logout,
-    getRegisteredStudents,
     carryOverCourses,
     result,
     allResults,
     getGPA,
-    generateToken
+    generateToken,
+    getRegisteredCourses
 } = require('../controllers/studentController');
 const router = require('express').Router();
-const authMiddleware = require('../middleware/authMiddleWare');
 
 router.post('/signIn', signIn);
-router.post('/logout', authMiddleware, logout);
-router.get('/profile/:studentId', authMiddleware, studentProfile);
-router.get('/registeredCourses/studentId', authMiddleware, getRegisteredStudents);
-router.get('/carryOverCourses/:id', authMiddleware, carryOverCourses);
-router.post('/result/:id', authMiddleware, result);
-router.get('/results/:id', authMiddleware, allResults);
-router.post('/gpa/:id', authMiddleware, getGPA);
-router.post('/refresh_token', authMiddleware, generateToken)
+router.post('/logout',  logout);
+router.get('/profile/:studentId',  studentProfile);
+router.get('/profile/registered-courses/:studentId', getRegisteredCourses)
+router.get('/carryOverCourses/:studentId',  carryOverCourses);
+router.get('/result/:studentId',  result);
+router.get('/results/:studentId',  allResults);
+router.get('/gpa/:studentId',  getGPA);
+router.post('/refresh_token',  generateToken)
 
 module.exports = router;

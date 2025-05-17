@@ -30,7 +30,7 @@ const lecturerController = {
 
     logout: async (req, res) => {
         try {
-            res.clearCookie('refreshtoken', { path: '/api/refresh_token' });
+            res.clearCookie('refreshtoken', { path: '/api/lecturer/refresh_token' });
             return res.json({ msg: "Logged out" });
         } catch (error) {
             return res.status(500).json({ msg: error.message });
@@ -52,7 +52,10 @@ const lecturerController = {
         const { lecturerId } = req.params;
         try {
             const lecturer = await Lecturer.findById(lecturerId);
-            const courses = lecturer.coursesTaking;
+            const coursesTaking = lecturer.coursesTaking;
+            const courses = coursesTaking.map((coursee) => ({
+                "Course-Code": coursee
+            }))
             if (!courses.length) return res.status(404).json({ message: 'No courses found for this lecturer' });
             return res.status(200).json({ message: 'Courses retrieved successfully', courses });
         } catch (error) {
@@ -63,21 +66,37 @@ const lecturerController = {
     getCourseTaking: async (req, res) => {
         const { courseCode } = req.params;
         try {
-            const course = coursesData[department]?.[level]?.[semester][courseCode]
+            let course = null;
+            for (const dept in coursesData) {
+                for (const level in coursesData[dept]) {
+                    for (const sem in coursesData[dept][level]) {
+                        const found = coursesData[dept][level][sem].find(c => c['Course-Code'] === courseCode);
+                        if (found) {
+                            course = found;
+                            break;
+                        }
+                    }
+                    if (course) break;
+                }
+                if (course) break;
+            }
+            if (!course) return res.status(404).json({ message: 'Course not found' });
             return res.status(200).json({ message: 'Course retrieved successfully', course });
         } catch (error) {
             return res.status(500).json({ message: `Server error: ${error.message}` });
         }
     },
-    
+
     getRegisteredStudents: async (req, res) => {
         const {courseCode} = req.params;
         try {
-            const students = await Student.find();
-            const resgisteredStudents = students.filter(student => {
-                student.registeredCourses.includes(courseCode);
-            }).map(student => student)
-            return res.status(200).json({message: 'Students', resgisteredStudents })
+            const students = await Student.find({
+                registeredCourses: courseCode
+            })
+            return res.status(200).json({
+                message: 'Registered students retrieved',
+                students
+            });
         } catch (error) {
             return res.status(500).json({ message: `Server error: ${error.message}` });
         }
@@ -85,10 +104,19 @@ const lecturerController = {
 
     getCourseResults: async (req, res) => {
         const { lecturerId } = req.params;
-        const { courseCode } = req.body;
+        const { courseCode } = req.query;
         try {
-            const result = await Result.find({courseCode: courseCode, lecturer: lecturerId})
-            return res.status(200).json({ message: 'Course results retrieved successfully', course, result });
+            const results = await Result.find({
+                courseCode,
+                lecturer: lecturerId
+            }).populate('student', 'fullName matricNo');
+            if (!results.length) {
+                return res.status(404).json({ message: 'No results found for this course' });
+            }
+            return res.status(200).json({
+                message: 'Course results retrieved successfully',
+                results
+            });
         } catch (error) {
             console.error('Error in getCourseResults:', error.message);
             return res.status(500).json({ message: `Server error: ${error.message}` });
@@ -99,23 +127,74 @@ const lecturerController = {
         const { lecturerId } = req.params;
         const { results } = req.body;
         try {
-            const lecturer = await Lecturer.findById(lecturerId);
-            const assignedCourses = lecturer.coursesTaking;
-            for (const result of results) {
-                const student = await Student.findById(result.studentId);
-                if (!student) continue;
-                const course = assignedCourses.find(c => c === result.courseCode);
-                if (!course) continue;
-                await Result.create({
-                    student: result.studentId,
-                    course: course,
-                    testScore: result.testScore,
-                    examScore: result.examScore,
-                    semester: student.currentSemester,
-                    level: student.currentLevel,
+            const submissionsClosed = await Result.exists({ isClosed: true });
+            if (submissionsClosed) {
+                return res.status(403).json({
+                    message: 'Result submission is currently closed'
                 });
             }
-            return res.status(200).json({ message: 'Results uploaded successfully' });
+            const lecturer = await Lecturer.findById(lecturerId);
+            if (!lecturer) {
+                return res.status(404).json({ message: 'Lecturer not found' });
+            }
+            const assignedCourses = lecturer.coursesTaking;
+            const uploadedResults = [];
+            const errors = [];
+            for (const result of results) {
+                try {
+                    const student = await Student.findById(result.studentId);
+                    if (!student) {
+                        errors.push(`Student with ID ${result.studentId} not found`);
+                        continue;
+                    }
+                    const course = assignedCourses.find(c => 
+                        (typeof c === 'string' ? c : c.courseCode) === result.courseCode
+                    );
+                    if (!course) {
+                        errors.push(`Course ${result.courseCode} not assigned to lecturer`);
+                        continue;
+                    }
+                    if (result.testScore < 0 || result.testScore > 40 || 
+                        result.examScore < 0 || result.examScore > 60) {
+                        errors.push(`Invalid scores for student ${result.studentId}, course ${result.courseCode}`);
+                        continue;
+                    }
+                    const existingResult = await Result.findOne({
+                        student: result.studentId,
+                        courseCode: result.courseCode,
+                        semester: student.currentSemester,
+                        level: student.currentLevel
+                    });
+                    
+                    if (existingResult) {
+                        if (existingResult.isReleased) {
+                            errors.push(`Result for student ${result.studentId}, course ${result.courseCode} has already been released`);
+                            continue;
+                        }
+                        existingResult.testScore = result.testScore;
+                        existingResult.examScore = result.examScore;
+                        await existingResult.save();
+                        uploadedResults.push(existingResult);
+                    } else {
+                        const newResult = await Result.create({
+                            student: result.studentId,
+                            courseCode: typeof course === 'string' ? course : course.courseCode,
+                            testScore: result.testScore,
+                            examScore: result.examScore,
+                            semester: student.currentSemester,
+                            level: student.currentLevel,
+                        });
+                        uploadedResults.push(newResult);
+                    }
+                } catch (innerError) {
+                    errors.push(`Error processing result for student ${result.studentId}: ${innerError.message}`);
+                }
+            }
+            return res.status(200).json({
+                message: 'Results processing completed',
+                resultsUploaded: uploadedResults.length,
+                errors: errors.length > 0 ? errors : undefined
+            });
         } catch (error) {
             console.error('Error in uploadCourseResults:', error.message);
             return res.status(500).json({ message: `Server error: ${error.message}` });
@@ -126,26 +205,54 @@ const lecturerController = {
         const { lecturerId } = req.params;
         const { data } = req.body;
         try {
-            const result = await Result.findOneAndUpdate(
-                {
-                    courseCode: data.courseCode, 
-                    lecturer: lecturerId, 
-                    student: data.studentId
-                },
-                {
-                    testScore: data.testScore,
-                    examScore: data.examScore
-                },
-                { new: true }
+            const submissionsClosed = await Result.exists({ isClosed: true });
+            if (submissionsClosed) {
+                return res.status(403).json({
+                    message: 'Result submission is currently closed'
+                });
+            }
+            const lecturer = await Lecturer.findById(lecturerId);
+            if (!lecturer) {
+                return res.status(404).json({ message: 'Lecturer not found' });
+            }            
+            const isAssignedCourse = lecturer.coursesTaking.some(c => 
+                (typeof c === 'string' ? c : c.courseCode) === data.courseCode
             );
-            
+            if (!isAssignedCourse) {
+                return res.status(403).json({ 
+                    message: 'You are not authorized to edit results for this course' 
+                });
+            }
+            if (data.testScore < 0 || data.testScore > 40 || 
+                data.examScore < 0 || data.examScore > 60) {
+                return res.status(400).json({ 
+                    message: 'Invalid test or exam scores. Test score must be 0-40, exam score 0-60.' 
+                });
+            }
+            const result = await Result.findOne({
+                courseCode: data.courseCode,
+                student: data.studentId
+            });
             if (!result) {
                 return res.status(404).json({ message: 'Result not found' });
             }
+            if (result.isReleased) {
+                return res.status(403).json({ 
+                    message: 'Cannot edit result that has already been released' 
+                });
+            }
+            if (result.isGpaCalculated) {
+                return res.status(403).json({ 
+                    message: 'Cannot edit result that has already been used in GPA calculation' 
+                });
+            }
+            result.testScore = data.testScore;
+            result.examScore = data.examScore;
+            await result.save();
             
-            return res.status(200).json({ 
+            return res.status(200).json({
                 message: 'Result updated successfully',
-                result 
+                result
             });
         } catch (error) {
             console.error('Error in editCourseResults:', error.message);

@@ -11,17 +11,16 @@ const {
     getRegisteredStudents
 } = require('../controllers/lecturerController');
 const router = require('express').Router();
-const authMiddleware = require('../middleware/authMiddleWare');
 
 router.post('/signIn', signIn);
-router.post('/logout', authMiddleware,logout);
-router.get('/profile/:lecturerId', authMiddleware, lecturerProfile);
-router.get('/registered-students/:courseCode', authMiddleware, getRegisteredStudents)
-router.get('/courses-taking/:lecturerId', authMiddleware,coursesTaking);
-router.get('/course-taking/:courseCode', authMiddleware,getCourseTaking);
-router.get('/results/:lecturerId', authMiddleware,getCourseResults);
-router.put('/result/:lecturerId', authMiddleware,editCourseResults);
-router.post('/result/:lecturerId', authMiddleware,uploadCourseResults);
-router.post('/refresh_token', authMiddleware,generateToken)
+router.post('/logout', logout);
+router.get('/profile/:id',  lecturerProfile);
+router.get('/registered-students/:courseCode',  getRegisteredStudents)
+router.get('/courses-taking/:lecturerId', coursesTaking);
+router.get('/course-taking/:courseCode', getCourseTaking);
+router.get('/results/:lecturerId', getCourseResults);
+router.put('/result/:lecturerId', editCourseResults);
+router.post('/result/:lecturerId', uploadCourseResults);
+router.post('/refresh_token', generateToken)
 
 module.exports = router;

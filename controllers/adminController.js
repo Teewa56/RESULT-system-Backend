@@ -34,7 +34,7 @@ const adminController = {
 
     logout: async (req, res) => {
         try {
-            res.clearCookie('refreshtoken', { path: '/api/refresh_token' });
+            res.clearCookie('refreshtoken', { path: '/api/admin/refresh_token' });
             return res.status(200).json({ msg: "Logged out" });
         } catch (error) {
             return res.status(500).json({ msg: error.message });
@@ -42,9 +42,9 @@ const adminController = {
     },
 
     adminProfile: async (req, res) => {
-        const { id } = req.params;
+        const { adminId } = req.params; 
         try {
-            const admin = await Admin.findById(id);
+            const admin = await Admin.findById(adminId);
             if (!admin) return res.status(404).json({ message: 'Admin not found' });
             return res.status(200).json({ message: 'Admin profile retrieved successfully', admin });
         } catch (error) {
@@ -186,16 +186,16 @@ const adminController = {
             }
 
             const newLecturer = new Lecturer({
-                fullName,
-                email,
-                registrationId,
-                stateOfOrigin,
-                department,
-                dateOfBirth,
-                profilePic,
-                phone,
-                gender,
-                dateEmployed,
+                fullName: fullName,
+                email: email,
+                registrationId: registrationId,
+                stateOfOrigin: stateOfOrigin,
+                department: department,
+                dateOfBirth: dateOfBirth,
+                profilePic: profilePic,
+                phone: phone,
+                gender: gender,
+                dateEmployed: dateEmployed,
                 coursesTaking: unassignedCourses,
             });
             await newLecturer.save();
@@ -266,39 +266,35 @@ const adminController = {
 
     resultPreview: async (req, res) => {
         const { data } = req.body;
-        const {level, department, semester} = data;
+        const { level, department, semester } = data;
+
         try {
-            const students = await Student.find({ 
-                currentLevel: level, 
-                department: department, 
-                currentSemester: semester 
-            });
-            
-            if (!students.length) {
-                return res.status(404).json({ 
-                    message: 'No students found for the specified criteria' 
-                });
-            }
+            const students = await Student.find({
+            currentLevel: level,
+            department,
+            currentSemester: semester
+        });
 
-            const results = await Promise.all(students.map(async (student) => {
-                const studentResults = await Result.find({
-                    student: student._id, 
-                    level: level, 
-                    semester: semester
-                });
-                
-                return {
-                    studentId: student._id,
-                    fullName: student.fullName,
-                    matricNo: student.matricNo,
-                    results: studentResults
-                };
-            }));
-
-            return res.status(200).json({ 
-                message: 'Results retrieved successfully', 
-                results 
+        const results = await Promise.all(students.map(async (student) => {
+            const studentResults = await Result.find({
+                student: student._id,
+                level,
+                semester
             });
+
+            return {
+                studentId: student._id,
+                fullName: student.fullName,
+                matricNo: student.matricNo,
+                results: studentResults
+            };
+        }));
+
+        return res.status(200).json({
+            message: 'Results retrieved successfully',
+            results
+        });
+
         } catch (error) {
             console.error(error.message);
             return res.status(500).json({ message: `Server error: ${error.message}` });
@@ -356,7 +352,7 @@ const adminController = {
                 } else if (student.currentSemester === 'Second Semester' && student.currentLevel !== 'Final Year') {
                     student.currentLevel = `${parseInt(student.currentLevel) + 100} Level`;
                     student.currentSemester = 'First Semester';
-                    student.currentSession = `${parseInt(student.currentSession) + 1} Session`;
+                    student.currentSession = `${parseInt(student.currentSession.split('/')[0]) + 1}/${parseInt(student.currentSession.split('/')[1]) + 1}`;
                     student.levelsCompleted += 1;
                 } else {
                     student.currentSemester = 'Second Semester';
@@ -371,13 +367,23 @@ const adminController = {
     },
 
     getCourseInfo: async (req, res) => {
-        const { data} = req.body;
-        const {department, level, semester } = data;
         try {
-            const courses = coursesData[department]?.[level]?.[semester] || [];
-            if (!courses.length) return res.status(404).json({ message: 'No courses found for the specified criteria' });
-
-            return res.status(200).json({ message: 'Course information retrieved successfully', courses });
+            const { department, level, semester } = req.query;
+            if (!department || !level || !semester) {
+                return res.status(400).json({ 
+                    message: 'Department, level, and semester are required parameters' 
+                });
+            }
+            const courses = coursesData[department][level][semester] || [];
+            if (!courses.length) {
+                return res.status(404).json({ 
+                    message: 'No courses found for the specified criteria' 
+                });
+            }
+            return res.status(200).json({ 
+                message: 'Course information retrieved successfully', 
+                courses 
+            });
         } catch (error) {
             console.error(error.message);
             return res.status(500).json({ message: `Server error: ${error.message}` });
@@ -435,7 +441,17 @@ const adminController = {
             return res.status(500).json({ message: `Server error: ${error.message}` });
         }
     },
-
+    getCurrentSemester: async(req, res) => {
+        try {
+            const student = await Student.findOne();
+            if (!student) return res.status(404).json({ message: 'No student found' });
+            const currentSemester = student.currentSemester;
+            return res.status(200).json({ message: 'Current Semester', currentSemester }); 
+        } catch (error) {
+            console.error(error.message);
+            return res.status(500).json({ message: `Server error: ${error.message}` });
+        }
+    },
     generateToken: async (req, res) => {
             try {
                 const rf_token = req.cookies.refreshtoken;

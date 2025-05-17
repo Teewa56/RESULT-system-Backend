@@ -10,6 +10,7 @@ const studentSchema = new Schema({
   stateOfOrigin:        { type: String },
   department:           { type: String },
   dateOfBirth:          { type: String },
+  semesterGPA:          { type: Number, default: 0 },
   cgpa:                 { type: Number, default: 0 }, 
   levelsCompleted:      { type: Number, default: 0 }, 
   currentSession:       { type: String },
