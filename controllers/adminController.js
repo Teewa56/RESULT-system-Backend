@@ -315,7 +315,7 @@ const adminController = {
 
     releaseResult: async (req, res) => {
         try {
-            const results = await Result.find();
+            const results = await Result.find({isReleased: false, isClosed: true});
             if (!results.length) return res.status(404).json({ message: 'No results available to release' });
             await Result.updateMany({}, { $set: { isReleased: true } });
             return res.status(200).json({ message: 'Results released successfully' });

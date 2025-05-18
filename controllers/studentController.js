@@ -112,7 +112,7 @@ const studentController = {
     allResults: async (req, res) => {
         const { studentId } = req.params;
         try {
-            const results = await Result.find({ student: studentId });
+            const results = await Result.find({ student: studentId, isReleased: true });
             if (!results.length) return res.status(404).json({ message: "No results found" });
             return res.status(200).json({ message: "All results retrieved successfully", results });
         } catch (error) {

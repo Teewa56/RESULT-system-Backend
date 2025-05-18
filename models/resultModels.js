@@ -12,7 +12,8 @@ const resultSchema = new Schema({
   isClosed:     { type: Boolean, default: false},
   lecturer:     { type: Schema.Types.ObjectId, ref: 'Lecturer', required: true },
   isReleased:   { type: Boolean, default: false },
-  isGpaCalculated: { type: Boolean, default: false }
+  isGpaCalculated: { type: Boolean, default: false },
+  isUploaded:   { type: Boolean, default: false },
 }, { timestamps: true });
 
 resultSchema.index({student: 1, courseCode: 1, semester: 1}, {unique: true});

@@ -81,7 +81,12 @@ const lecturerController = {
                 if (course) break;
             }
             if (!course) return res.status(404).json({ message: 'Course not found' });
-            return res.status(200).json({ message: 'Course retrieved successfully', course });
+            const crs = await Result.findOne({ courseCode });
+            let uploaded = false;
+            if (crs && crs.isUploaded === true) {
+                uploaded = true;
+            }                    
+            return res.status(200).json({ message: 'Course retrieved successfully', course, uploaded });
         } catch (error) {
             return res.status(500).json({ message: `Server error: ${error.message}` });
         }
@@ -125,8 +130,14 @@ const lecturerController = {
 
     uploadCourseResults: async (req, res) => {
         const { lecturerId } = req.params;
-        const { results } = req.body;
+        const { data } = req.body;
+        const { results } = data || {};
         try {
+            if (!results || !Array.isArray(results)) {
+                return res.status(400).json({ 
+                    message: 'Invalid request format: results array is required' 
+                });
+            }
             const submissionsClosed = await Result.exists({ isClosed: true });
             if (submissionsClosed) {
                 return res.status(403).json({
@@ -183,6 +194,8 @@ const lecturerController = {
                             examScore: result.examScore,
                             semester: student.currentSemester,
                             level: student.currentLevel,
+                            lecturer: lecturerId,
+                            isUploaded: true,
                         });
                         uploadedResults.push(newResult);
                     }
