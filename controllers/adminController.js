@@ -14,11 +14,11 @@ const adminController = {
         const {fullName, userId, adminPassword} = data;
         try {
             const adminIdRegex = /^[A-Z]{4}\/\d{4}$/;
-            if (!adminIdRegex.test(userId)) return res.status(400).json({ message: 'Invalid admin ID format' });
+            if (!adminIdRegex.test(userId)) return res.status(401).json({ message: 'Invalid admin ID format' });
             const admin = await Admin.findOne({ adminId: userId });
             if (!admin) return res.status(404).json({ message: 'Admin not found' });
-            if (admin.fullName !== fullName) return res.status(401).json({ message: 'Wrong name' });
-            if (!(await bcrypt.compare(adminPassword, admin.hashedPassword))) return res.status(401).json({ message: 'Wrong password' });
+            if (admin.fullName.toLocaleLowerCase() !== fullName.toLocaleLowerCase()) return res.status(401).json({ message: 'Wrong name' });
+            if (!(await bcrypt.compare(adminPassword, admin.hashedPassword))) return res.status(402).json({ message: 'Wrong password' });
             const access_token = adminController.creatAccessToken({ id: admin._id });
             const refresh_token = adminController.createRefreshToken({ id: admin._id });
             res.cookie('refresh_token', refresh_token, {
@@ -235,10 +235,11 @@ const adminController = {
     searchStudent: async (req, res) => {
         const { search } = req.params;
         try {
+            const formattedSearch = search.toUpperCase();
             const results = await Student.find({
                 $or: [
-                    { fullName: { $regex: search, $options: 'i' } },
-                    { matricNo: { $regex: search, $options: 'i' } },
+                    { fullName: { $regex: search } },
+                    { matricNo: { $regex: formattedSearch } },
                 ],
             });
             if (!results.length) return res.status(404).json({ message: 'No students found matching the search criteria' });
@@ -251,10 +252,11 @@ const adminController = {
     searchLecturer: async (req, res) => {
         const { search } = req.body;
         try {
+            const formattedSearch = search.toUpperCase();
             const results = await Lecturer.find({
                 $or: [
-                    { fullName: { $regex: search, $options: 'i' } },
-                    { registrationId: { $regex: search, $options: 'i' } },
+                    { fullName: { $regex: search } },
+                    { registrationId: { $regex: formattedSearch } },
                 ],
             });
             if (!results.length) return res.status(404).json({ message: 'No lecturers found matching the search criteria' });
