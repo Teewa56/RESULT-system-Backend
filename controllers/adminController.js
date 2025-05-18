@@ -269,7 +269,6 @@ const adminController = {
     resultPreview: async (req, res) => {
         const { data } = req.body;
         const { level, department, semester } = data;
-
         try {
             const students = await Student.find({
             currentLevel: level,

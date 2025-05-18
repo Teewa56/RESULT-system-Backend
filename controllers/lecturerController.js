@@ -86,7 +86,11 @@ const lecturerController = {
             if (crs && crs.isUploaded === true) {
                 uploaded = true;
             }                    
-            return res.status(200).json({ message: 'Course retrieved successfully', course, uploaded });
+            let isClosed = false;
+            if (crs && crs.isClosed === true) {
+                isClosed = true;
+            }
+            return res.status(200).json({ message: 'Course retrieved successfully', course, uploaded, isClosed });
         } catch (error) {
             return res.status(500).json({ message: `Server error: ${error.message}` });
         }
