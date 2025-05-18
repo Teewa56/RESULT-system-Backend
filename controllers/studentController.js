@@ -11,7 +11,6 @@ const studentController = {
             const matricNumberRegex = /^[A-Za-z]{3}\/\d{2}\/\d{4}$/;
             if (!matricNumberRegex.test(userId)) return res.status(401).json({ message: "Invalid matric number format" });
             const student = await Student.findOne({ matricNo: userId });
-            console.log("Student Found:", student);
             if (!student) return res.status(404).json({ message: "Student not found" });
             if (student.fullName.toLocaleLowerCase() !== fullName.toLocaleLowerCase()) return res.status(401).json({ message: "Invalid credentials" });
             const access_token = studentController.createAccessToken({ id: student._id });
