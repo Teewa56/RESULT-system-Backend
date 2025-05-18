@@ -24,7 +24,8 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/lecturer', lecturerRoutes);
 app.use(errorMiddleware);
-app.use(limiter);   
+app.use(limiter); 
+app.set('trust proxy', 1);  
 
 const server = http.createServer(app);
 const port = process.env.PORT;
