@@ -28,14 +28,7 @@ app.use(limiter);
 app.set('trust proxy', 1);  
 
 app.get('/', (req, res) => {
-    const listRoutes = () => {
-        app._router.stack.forEach((middleware) => {
-            if (middleware.route) {
-                console.log(`${middleware.route.stack[0].method.toUpperCase()} ${middleware.route.path}`);
-            }
-        });
-    };
-    res.send('Server is running successfully', listRoutes());
+    res.send('Server is running successfully');
 });
 
 const server = http.createServer(app);
