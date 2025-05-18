@@ -6,7 +6,7 @@ const coursesData = require('../courses.json');
 const studentController = {
     signIn: async (req, res) => {
         const { data } = req.body;
-        console.log("SignIn Data:", data);
+        const { fullName, userId } = data;
         try {
             const matricNumberRegex = /^[A-Za-z]{3}\/\d{2}\/\d{4}$/;
             if (!matricNumberRegex.test(userId)) return res.status(401).json({ message: "Invalid matric number format" });
