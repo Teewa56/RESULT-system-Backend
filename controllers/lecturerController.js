@@ -50,50 +50,125 @@ const lecturerController = {
 
     coursesTaking: async (req, res) => {
         const { lecturerId } = req.params;
+        console.log(lecturerId);
         try {
             const lecturer = await Lecturer.findById(lecturerId);
+            if (!lecturer || !lecturer.coursesTaking || !lecturer.coursesTaking.length) {
+                return res.status(404).json({ message: 'No courses found for this lecturer' });
+            }
+            
             const coursesTaking = lecturer.coursesTaking;
-            const courses = coursesTaking.map((coursee) => ({
-                "Course-Code": coursee
-            }))
-            if (!courses.length) return res.status(404).json({ message: 'No courses found for this lecturer' });
-            return res.status(200).json({ message: 'Courses retrieved successfully', courses });
+            
+            const student = await Student.findOne({ registeredCourses: { $in: coursesTaking } });
+            if (!student) {
+                return res.status(404).json({ message: 'No students found for these courses' });
+            }
+            
+            const currentSemester = student.currentSemester;
+            let currentSemesterCourses = [];
+            
+            for (const dept in coursesData) {
+                for (const level in coursesData[dept]) {
+                    if (coursesData[dept][level][currentSemester]) {
+                        const semesterCourses = coursesData[dept][level][currentSemester];
+                        
+                        if (Array.isArray(semesterCourses)) {
+                            const filtered = semesterCourses.filter(course => 
+                                coursesTaking.includes(course['Course-Code'])
+                            );
+                            currentSemesterCourses = [...currentSemesterCourses, ...filtered];
+                        } else if (typeof semesterCourses === 'object' && semesterCourses !== null) {
+                            for (const code of coursesTaking) {
+                                if (semesterCourses['Course-Code'] === code) {
+                                    currentSemesterCourses.push(semesterCourses);
+                                } else if (semesterCourses[code]) {
+                                    currentSemesterCourses.push(semesterCourses[code]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if (!currentSemesterCourses.length) {
+                const courses = coursesTaking.map(courseCode => ({
+                    "Course-Code": courseCode,
+                    "Semester": currentSemester
+                }));
+                
+                return res.status(200).json({
+                    message: 'Basic course information retrieved successfully for current semester',
+                    currentSemester,
+                    courses
+                });
+            }
+            const uniqueCourses = [];
+            const courseCodes = new Set();
+            
+            for (const course of currentSemesterCourses) {
+                if (!courseCodes.has(course['Course-Code'])) {
+                    courseCodes.add(course['Course-Code']);
+                    uniqueCourses.push(course);
+                }
+            }
+            
+            return res.status(200).json({
+                message: 'Courses retrieved successfully for current semester',
+                currentSemester,
+                courses: uniqueCourses
+            });
         } catch (error) {
+            console.error('Error in coursesTaking:', error);
             return res.status(500).json({ message: `Server error: ${error.message}` });
         }
     },
 
     getCourseTaking: async (req, res) => {
         const { courseCode } = req.params;
+        
         try {
             let course = null;
-            const sstudent = Student.findOne({ registeredCourses: courseCode })
-            const semester = sstudent.currentSemester;
             for (const dept in coursesData) {
                 for (const level in coursesData[dept]) {
-                    if (coursesData[dept][level][semester]) {
-                        const found = coursesData[dept][level][semester].find(c => c['Course-Code'] === courseCode);
-                        if (found) {
-                            course = found;
-                            break;
+                    for (const sem in coursesData[dept][level]) {
+                        const courses = coursesData[dept][level][sem];
+                        if (Array.isArray(courses)) {
+                            const found = courses.find(c => c['Course-Code'] === courseCode);
+                            if (found) {
+                                course = found;
+                                break;
+                            }
+                        } else if (typeof courses === 'object' && courses !== null) {
+                            if (courses['Course-Code'] === courseCode) {
+                                course = courses;
+                                break;
+                            }
                         }
                     }
                     if (course) break;
                 }
                 if (course) break;
             }
+            
             if (!course) return res.status(404).json({ message: 'Course not found' });
             const student = await Student.findOne({ registeredCourses: courseCode });
             const crs = await Result.findOne({ courseCode, student: student._id });
             let uploaded = false;
             if (crs && crs.isUploaded === true) {
                 uploaded = true;
-            }                    
+            }
+            
             let isClosed = false;
             if (crs && crs.isClosed === true) {
                 isClosed = true;
             }
-            return res.status(200).json({ message: 'Course retrieved successfully', course, uploaded, isClosed });
+            
+            return res.status(200).json({ 
+                message: 'Course retrieved successfully', 
+                course, 
+                uploaded, 
+                isClosed 
+            });
         } catch (error) {
             return res.status(500).json({ message: `Server error: ${error.message}` });
         }
