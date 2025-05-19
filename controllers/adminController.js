@@ -8,6 +8,16 @@ const coursesData = require('../courses.json');
 const crypto = require('crypto');
 require('dotenv').config();
 
+
+const calculateGrade = (score) => {
+    if (score >= 70) return { grade: 'A', point: 5 };
+    if (score >= 60) return { grade: 'B', point: 4 };
+    if (score >= 50) return { grade: 'C', point: 3 };
+    if (score >= 45) return { grade: 'D', point: 2 };
+    if (score >= 40) return { grade: 'E', point: 1 };
+    return { grade: 'F', point: 0 };
+};
+
 const adminController = {
     signIn: async (req, res) => {
         const { data } = req.body;
@@ -314,10 +324,63 @@ const adminController = {
 
     releaseResult: async (req, res) => {
         try {
-            const results = await Result.find({isReleased: false, isClosed: true});
-            if (!results.length) return res.status(404).json({ message: 'No results available to release' });
-            await Result.updateMany({}, { $set: { isReleased: true } });
-            return res.status(200).json({ message: 'Results released successfully' });
+            const results = await Result.find({ isReleased: false, isClosed: true });
+            if (!results.length)
+                return res.status(404).json({ message: 'No results available to release' });
+
+            const studentsToUpdate = new Set(results.map(r => r.student.toString()));
+
+            for (const studentId of studentsToUpdate) {
+                const studentResults = results.filter(r => r.student.toString() === studentId);
+                let totalWeightedPoints = 0;
+                let totalUnits = 0;
+                let failedCourses = [];
+
+                const student = await Student.findById(studentId);
+                if (!student) continue;
+
+                for (const result of studentResults) {
+                    const { testScore, examScore, courseCode, level, semester } = result;
+                    const totalScore = testScore + examScore;
+                    const { grade, point } = calculateGrade(totalScore);
+
+                    const courseInfo = coursesData[student.department]?.[level]?.[semester]?.find(
+                        c => c["Course-Code"] === courseCode
+                    );
+                    const courseUnits = courseInfo?.["Course-Units"] || 0;
+
+                    result.grade = grade;
+                    result.gradePoint = point;
+                    result.isGpaCalculated = true;
+                    result.isReleased = true;
+                    await result.save();
+
+                    totalWeightedPoints += point * courseUnits;
+                    totalUnits += courseUnits;
+
+                    if (point === 0) {
+                        failedCourses.push({
+                            courseCode,
+                            level,
+                            semester,
+                            department: student.department,
+                            reason: 'carryover',
+                        });
+                    }
+                }
+
+                const semesterGPA = totalUnits > 0 ? +(totalWeightedPoints / totalUnits).toFixed(2) : 0;
+                const newLevelsCompleted = student.levelsCompleted + 1;
+                const newCGPA = +(((student.cgpa * student.levelsCompleted) + semesterGPA) / newLevelsCompleted).toFixed(2);
+
+                student.semesterGPA = semesterGPA;
+                student.cgpa = newCGPA;
+                student.levelsCompleted = newLevelsCompleted;
+                student.carryOvers.push(...failedCourses);
+                await student.save();
+            }
+
+            return res.status(200).json({ message: 'Results released and GPA/CGPA calculated successfully' });
         } catch (error) {
             console.error(error.message);
             return res.status(500).json({ message: `Server error: ${error.message}` });

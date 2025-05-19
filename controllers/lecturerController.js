@@ -81,7 +81,8 @@ const lecturerController = {
                 if (course) break;
             }
             if (!course) return res.status(404).json({ message: 'Course not found' });
-            const crs = await Result.findOne({ courseCode });
+            const student = await Student.findOne({ registeredCourses: courseCode });
+            const crs = await Result.findOne({ courseCode, student: student._id });
             let uploaded = false;
             if (crs && crs.isUploaded === true) {
                 uploaded = true;
