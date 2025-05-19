@@ -16,7 +16,7 @@ router.post('/logout',  logout);
 router.get('/profile/:studentId',  studentProfile);
 router.get('/profile/registered-courses/:studentId', getRegisteredCourses)
 router.get('/carryOverCourses/:studentId',  carryOverCourses);
-router.get('/result/:studentId',  result);
+router.post('/result/:studentId',  result);
 router.get('/results/:studentId',  allResults);
 router.get('/gpa/:studentId',  getGPA);
 router.post('/refresh_token',  generateToken)
