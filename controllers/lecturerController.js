@@ -67,10 +67,12 @@ const lecturerController = {
         const { courseCode } = req.params;
         try {
             let course = null;
+            const sstudent = Student.findOne({ registeredCourses: courseCode })
+            const semester = sstudent.currentSemester;
             for (const dept in coursesData) {
                 for (const level in coursesData[dept]) {
-                    for (const sem in coursesData[dept][level]) {
-                        const found = coursesData[dept][level][sem].find(c => c['Course-Code'] === courseCode);
+                    if (coursesData[dept][level][semester]) {
+                        const found = coursesData[dept][level][semester].find(c => c['Course-Code'] === courseCode);
                         if (found) {
                             course = found;
                             break;
