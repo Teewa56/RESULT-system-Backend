@@ -50,39 +50,38 @@ const lecturerController = {
 
     coursesTaking: async (req, res) => {
         const { lecturerId } = req.params;
-        console.log(lecturerId);
         try {
             const lecturer = await Lecturer.findById(lecturerId);
             if (!lecturer || !lecturer.coursesTaking || !lecturer.coursesTaking.length) {
                 return res.status(404).json({ message: 'No courses found for this lecturer' });
             }
-            
             const coursesTaking = lecturer.coursesTaking;
-            
-            const student = await Student.findOne({ registeredCourses: { $in: coursesTaking } });
-            if (!student) {
-                return res.status(404).json({ message: 'No students found for these courses' });
-            }
-            
-            const currentSemester = student.currentSemester;
-            let currentSemesterCourses = [];
-            
+            let allCourses = [];
             for (const dept in coursesData) {
                 for (const level in coursesData[dept]) {
-                    if (coursesData[dept][level][currentSemester]) {
-                        const semesterCourses = coursesData[dept][level][currentSemester];
+                    for (const semester in coursesData[dept][level]) {
+                        const semesterCourses = coursesData[dept][level][semester];
                         
                         if (Array.isArray(semesterCourses)) {
-                            const filtered = semesterCourses.filter(course => 
-                                coursesTaking.includes(course['Course-Code'])
-                            );
-                            currentSemesterCourses = [...currentSemesterCourses, ...filtered];
+                            const filtered = semesterCourses
+                                .filter(course => coursesTaking.includes(course['Course-Code']))
+                                .map(course => ({
+                                    ...course,
+                                    "Semester": semester
+                                }));
+                            allCourses = [...allCourses, ...filtered];
                         } else if (typeof semesterCourses === 'object' && semesterCourses !== null) {
                             for (const code of coursesTaking) {
                                 if (semesterCourses['Course-Code'] === code) {
-                                    currentSemesterCourses.push(semesterCourses);
+                                    allCourses.push({
+                                        ...semesterCourses,
+                                        "Semester": semester
+                                    });
                                 } else if (semesterCourses[code]) {
-                                    currentSemesterCourses.push(semesterCourses[code]);
+                                    allCourses.push({
+                                        ...semesterCourses[code],
+                                        "Semester": semester
+                                    });
                                 }
                             }
                         }
@@ -90,31 +89,27 @@ const lecturerController = {
                 }
             }
             
-            if (!currentSemesterCourses.length) {
+            if (!allCourses.length) {
                 const courses = coursesTaking.map(courseCode => ({
-                    "Course-Code": courseCode,
-                    "Semester": currentSemester
+                    "Course-Code": courseCode
                 }));
-                
                 return res.status(200).json({
-                    message: 'Basic course information retrieved successfully for current semester',
-                    currentSemester,
+                    message: 'Basic course information retrieved successfully',
                     courses
                 });
             }
             const uniqueCourses = [];
-            const courseCodes = new Set();
-            
-            for (const course of currentSemesterCourses) {
-                if (!courseCodes.has(course['Course-Code'])) {
-                    courseCodes.add(course['Course-Code']);
+            const trackDuplicates = new Set();
+            for (const course of allCourses) {
+                const uniqueKey = `${course['Course-Code']}_${course['Semester']}`;
+                if (!trackDuplicates.has(uniqueKey)) {
+                    trackDuplicates.add(uniqueKey);
                     uniqueCourses.push(course);
                 }
             }
             
             return res.status(200).json({
-                message: 'Courses retrieved successfully for current semester',
-                currentSemester,
+                message: 'All courses retrieved successfully with semester information',
                 courses: uniqueCourses
             });
         } catch (error) {
@@ -125,7 +120,6 @@ const lecturerController = {
 
     getCourseTaking: async (req, res) => {
         const { courseCode } = req.params;
-        
         try {
             let course = null;
             for (const dept in coursesData) {
