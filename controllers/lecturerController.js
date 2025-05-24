@@ -14,7 +14,7 @@ const lecturerController = {
             if (!lecturerIdRegex.test(userId)) return res.status(401).json({ message: 'Invalid registration ID format' });
             const lecturer = await Lecturer.findOne({ registrationId: userId });
             if (!lecturer) return res.status(404).json({ message: 'Lecturer not found' });
-            if(lecturer.fullName.toLocaleLowerCase() !== fullName.toLocaleLowerCase()) return res.status(401).json({message: 'Wrong name'})
+            if(lecturer.fullName.toLocaleLowerCase().trim() !== fullName.toLocaleLowerCase().trim()) return res.status(401).json({message: 'Wrong name'})
             const access_token = lecturerController.createAccessToken({ id: lecturer._id });
             const refresh_token = lecturerController.createRefreshToken({ id: lecturer._id });
             res.cookie('refresh_token', refresh_token, {

@@ -26,7 +26,7 @@ const adminController = {
             if (!adminIdRegex.test(userId)) return res.status(401).json({ message: 'Invalid admin ID format' });
             const admin = await Admin.findOne({ adminId: userId });
             if (!admin) return res.status(404).json({ message: 'Admin not found' });
-            if (admin.fullName.toLocaleLowerCase() !== fullName.toLocaleLowerCase()) return res.status(401).json({ message: 'Wrong name' });
+            if (admin.fullName.toLocaleLowerCase().trim() !== fullName.toLocaleLowerCase().trim()) return res.status(401).json({ message: 'Wrong name' });
             if (!(await bcrypt.compare(adminPassword, admin.hashedPassword))) return res.status(402).json({ message: 'Wrong password' });
             const access_token = adminController.creatAccessToken({ id: admin._id });
             const refresh_token = adminController.createRefreshToken({ id: admin._id });
@@ -367,12 +367,12 @@ const adminController = {
                 }
 
                 const semesterGPA = totalUnits > 0 ? +(totalWeightedPoints / totalUnits).toFixed(2) : 0;
-                const newLevelsCompleted = student.levelsCompleted + 1;
-                const newCGPA = +(((student.cgpa * student.levelsCompleted) + semesterGPA) / newLevelsCompleted).toFixed(2);
+                const newSemstersCompleted = student.semestersCompleted + 1;
+                const newCGPA = +(((student.cgpa * student.semestersCompleted) + semesterGPA) / newSemstersCompleted).toFixed(2);
 
                 student.semesterGPA = semesterGPA;
                 student.cgpa = newCGPA;
-                student.levelsCompleted = newLevelsCompleted;
+                student.semestersCompleted = newSemstersCompleted;
                 student.carryOverCourses.push(...failedCourses);
                 await student.save();
             }

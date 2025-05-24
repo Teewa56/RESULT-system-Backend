@@ -12,7 +12,7 @@ const studentController = {
             if (!matricNumberRegex.test(userId)) return res.status(401).json({ message: "Invalid matric number format" });
             const student = await Student.findOne({ matricNo: userId });
             if (!student) return res.status(404).json({ message: "Student not found" });
-            if (student.fullName.toLocaleLowerCase() !== fullName.toLocaleLowerCase()) return res.status(401).json({ message: "Invalid credentials" });
+            if (student.fullName.toLocaleLowerCase().trim() !== fullName.toLocaleLowerCase().trim()) return res.status(401).json({ message: "Invalid credentials" });
             const access_token = studentController.createAccessToken({ id: student._id });
             const refresh_token = studentController.createRefreshToken({ id: student._id });
             res.cookie('refresh_token', refresh_token, {

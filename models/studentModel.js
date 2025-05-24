@@ -13,6 +13,7 @@ const studentSchema = new Schema({
   semesterGPA:          { type: Number, default: 0 },
   cgpa:                 { type: Number, default: 0 }, 
   levelsCompleted:      { type: Number, default: 0 }, 
+  semestersCompleted:   { type: Number, default: 0 },
   currentSession:       { type: String },
   profilePic:           { type: String, default: null },
   phone:                { type: String },
