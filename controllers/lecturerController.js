@@ -187,12 +187,19 @@ const lecturerController = {
         const { lecturerId } = req.params;
         const { courseCode } = req.query;
         try {
+            const student = await Student.findOne({ registeredCourses: courseCode });
+            if (!student) {
+                return res.status(404).json({ message: 'No students currently registered for this course' });
+            }
+            const { currentSemester, currentLevel } = student;
             const results = await Result.find({
                 courseCode,
-                lecturer: lecturerId
+                lecturer: lecturerId,
+                semester: currentSemester,
+                level: currentLevel
             }).populate('student', 'fullName matricNo');
             if (!results.length) {
-                return res.status(404).json({ message: 'No results found for this course' });
+                return res.status(404).json({ message: 'No results found for this course in the current semester/level' });
             }
             return res.status(200).json({
                 message: 'Course results retrieved successfully',
