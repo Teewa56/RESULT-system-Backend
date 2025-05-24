@@ -296,6 +296,7 @@ const adminController = {
                 studentId: student._id,
                 fullName: student.fullName,
                 matricNo: student.matricNo,
+                cgpa: student.cgpa,
                 results: studentResults
             };
         }));
