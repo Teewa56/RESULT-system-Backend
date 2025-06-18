@@ -295,12 +295,6 @@ const lecturerController = {
         const { lecturerId } = req.params;
         const { data } = req.body;
         try {
-            const submissionsClosed = await Result.exists({ isClosed: true });
-            if (submissionsClosed) {
-                return res.status(403).json({
-                    message: 'Result submission is currently closed'
-                });
-            }
             const lecturer = await Lecturer.findById(lecturerId);
             if (!lecturer) {
                 return res.status(404).json({ message: 'Lecturer not found' });
