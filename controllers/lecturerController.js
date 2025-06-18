@@ -221,18 +221,6 @@ const lecturerController = {
                     message: 'Invalid request format: results array is required' 
                 });
             }
-            const {studentId} = results[0];
-            const stu = Student.findById(studentId);
-            const submissionsClosed = await Result.exists({ 
-                isClosed: true, 
-                semester: stu.currentSemester, 
-                level: stu.currentLevel 
-            });
-            if (submissionsClosed) {
-                return res.status(403).json({
-                    message: 'Result submission is currently closed'
-                });
-            }
             const lecturer = await Lecturer.findById(lecturerId);
             if (!lecturer) {
                 return res.status(404).json({ message: 'Lecturer not found' });
